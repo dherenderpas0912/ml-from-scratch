@@ -2,7 +2,7 @@
 
 > Every major ML algorithm — derived mathematically, implemented in NumPy, and explained with interactive visuals. Built for deep understanding, not just `model.fit()`.
 
-**[Live Portfolio →](https://yourusername.github.io/ml-from-scratch)**
+**[Live Portfolio →](https://dherenderpas0912.github.io/ml-from-scratch)**
 
 ---
 
@@ -16,7 +16,7 @@ Most ML practitioners can call a sklearn function. Fewer can explain why the gra
 
 | # | Topic | Notebook | Live Visual | Key concept covered |
 |---|---|---|---|---|
-| 01 | Gradient Descent | [notebook](01_gradient_descent/notebook.ipynb) | [open →](https://yourusername.github.io/ml-from-scratch/01_gradient_descent/) | ∂L/∂w derivation, Batch vs SGD vs Mini-batch |
+| 01 | Gradient Descent | [notebook](01_gradient_descent/notebook.ipynb) | [open →](https://dherenderpas0912.github.io/ml-from-scratch/01_gradient_descent/) | ∂L/∂w derivation, Batch vs SGD vs Mini-batch |
 | 02 | Linear Regression | coming soon | coming soon | OLS solution vs GD, R² |
 | 03 | Logistic Regression | coming soon | coming soon | Sigmoid, BCE loss, decision boundary |
 | 04 | Regularization | coming soon | coming soon | L1 vs L2, bias-variance tradeoff |
