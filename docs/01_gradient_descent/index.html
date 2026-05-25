@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gradient Descent — Visual Explainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@400;600;700&family=Syne+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0f14;
+  --surface: #141820;
+  --surface2: #1c2230;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --text: #e8eaf0;
+  --muted: #6b7280;
+  --accent: #4f8ef7;
+  --accent2: #34d399;
+  --amber: #fbbf24;
+  --red: #f87171;
+  --teal: #2dd4bf;
+  --mono: 'IBM Plex Mono', monospace;
+  --head: 'Syne', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--head);
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(12,15,20,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  display: flex; align-items: center; gap: 2rem;
+  height: 52px;
+}
+.nav-brand { font-size: 14px; font-weight: 700; color: var(--accent); letter-spacing: 0.05em; white-space: nowrap; }
+.nav-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+.nav-links a { font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing: 0.04em; transition: color .2s; }
+.nav-links a:hover { color: var(--text); }
+
+/* ── HERO ── */
+.hero {
+  padding: 5rem 2rem 4rem;
+  max-width: 860px; margin: 0 auto;
+  border-bottom: 1px solid var(--border);
+}
+.hero-tag {
+  display: inline-block; font-family: var(--mono); font-size: 11px;
+  color: var(--accent); background: rgba(79,142,247,0.1);
+  padding: 3px 10px; border-radius: 3px; margin-bottom: 1.5rem;
+  letter-spacing: 0.08em;
+}
+.hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 700; line-height: 1.1; margin-bottom: 1rem; }
+.hero h1 span { color: var(--accent); }
+.hero p { font-size: 15px; color: var(--muted); max-width: 560px; line-height: 1.8; }
+
+/* ── LAYOUT ── */
+main { max-width: 860px; margin: 0 auto; padding: 0 2rem 6rem; }
+.section { padding: 3rem 0 0; }
+.section-label {
+  font-family: var(--mono); font-size: 11px; color: var(--accent);
+  letter-spacing: 0.1em; margin-bottom: 0.5rem;
+}
+.section h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.75rem; }
+.section > p { color: var(--muted); margin-bottom: 1.5rem; max-width: 620px; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 12px;
+}
+.card-sm { padding: 1rem 1.25rem; }
+
+/* ── STEP BLOCKS ── */
+.steps { display: flex; flex-direction: column; gap: 0; }
+.step-item {
+  display: grid; grid-template-columns: 2rem 1fr;
+  gap: 0 1rem; position: relative;
+}
+.step-item + .step-item { margin-top: 0; }
+.step-num-col { display: flex; flex-direction: column; align-items: center; }
+.step-circle {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--accent); color: #fff;
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; z-index: 1;
+}
+.step-line { flex: 1; width: 1px; background: var(--border2); margin: 4px 0; }
+.step-content { padding-bottom: 1.5rem; }
+.step-content h3 { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px; padding-top: 4px; }
+
+/* ── CODE ── */
+.code-block {
+  font-family: var(--mono); font-size: 12px;
+  background: #0a0d12; border: 1px solid var(--border);
+  border-radius: 8px; padding: 14px 16px;
+  line-height: 2; color: #c9d1d9;
+  overflow-x: auto;
+}
+.code-block .kw { color: #79c0ff; }
+.code-block .cm { color: #484f58; }
+.code-block .fn { color: var(--accent2); }
+.code-block .var { color: #ffa657; }
+.code-block .op { color: var(--teal); }
+
+/* ── FORMULA ── */
+.formula {
+  font-family: var(--mono); font-size: 13px;
+  background: rgba(79,142,247,0.06);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px; margin-bottom: 12px;
+  line-height: 2; color: var(--text);
+}
+
+/* ── BADGE ── */
+.badge {
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  padding: 3px 9px; border-radius: 3px;
+  display: inline-block; margin-bottom: 10px; letter-spacing: 0.05em;
+}
+.b-blue { background: rgba(79,142,247,0.15); color: #93bbfa; }
+.b-amber { background: rgba(251,191,36,0.12); color: #fcd34d; }
+.b-teal { background: rgba(52,211,153,0.12); color: #6ee7b7; }
+.b-red { background: rgba(248,113,113,0.12); color: #fca5a5; }
+
+/* ── CONTROLS ── */
+.ctrl-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+}
+.ctrl-row label { font-family: var(--mono); font-size: 12px; color: var(--muted); white-space: nowrap; }
+.ctrl-row input[type=range] {
+  flex: 1; appearance: none; height: 4px;
+  background: var(--surface2); border-radius: 2px; outline: none; cursor: pointer;
+}
+.ctrl-row input[type=range]::-webkit-slider-thumb {
+  appearance: none; width: 16px; height: 16px; border-radius: 50%;
+  background: var(--accent); cursor: pointer;
+}
+.val-display {
+  font-family: var(--mono); font-size: 12px; font-weight: 500;
+  color: var(--accent); min-width: 40px;
+}
+
+/* ── STATS ── */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 8px; margin: 12px 0;
+}
+.stat-card {
+  background: var(--surface2); border-radius: 8px;
+  padding: 10px 12px; border: 1px solid var(--border);
+}
+.stat-label { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-bottom: 4px; letter-spacing: 0.05em; }
+.stat-val { font-family: var(--mono); font-size: 16px; font-weight: 500; color: var(--text); }
+
+/* ── EXPLAIN BOX ── */
+.explain-box {
+  font-family: var(--mono); font-size: 11px;
+  background: rgba(52,211,153,0.05);
+  border: 1px solid rgba(52,211,153,0.15);
+  border-radius: 8px; padding: 10px 14px;
+  color: var(--accent2); line-height: 1.8;
+  margin: 10px 0;
+}
+
+/* ── BUTTONS ── */
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+button {
+  font-family: var(--mono); font-size: 12px;
+  padding: 7px 16px; border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: var(--surface2); color: var(--text);
+  cursor: pointer; transition: all .15s;
+}
+button:hover { background: var(--surface); border-color: var(--accent); color: var(--accent); }
+button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+button.primary:hover { opacity: 0.85; }
+
+/* ── CANVAS WRAPPER ── */
+.canvas-wrap { position: relative; width: 100%; }
+
+/* ── GRID ── */
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+@media(max-width:600px) { .grid3,.grid2 { grid-template-columns: 1fr; } .stats-grid { grid-template-columns: repeat(2,1fr); } }
+
+/* ── LEGEND ── */
+.legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 10px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+/* ── FEATURED CARD ── */
+.featured { border: 1px solid rgba(52,211,153,0.35); }
+.featured-tag {
+  font-family: var(--mono); font-size: 10px;
+  background: rgba(52,211,153,0.12); color: #6ee7b7;
+  padding: 2px 8px; border-radius: 3px;
+  display: inline-block; margin-bottom: 8px;
+}
+
+/* ── COMPARISON TABLE ── */
+.cmp-row { display: grid; grid-template-columns: 130px repeat(3,1fr); gap: 0; }
+.cmp-row + .cmp-row { border-top: 1px solid var(--border); }
+.cmp-cell { padding: 10px 12px; font-family: var(--mono); font-size: 12px; }
+.cmp-head .cmp-cell { color: var(--muted); font-size: 11px; letter-spacing: 0.05em; }
+.cmp-label { color: var(--muted); }
+
+/* ── FOOTER ── */
+footer {
+  text-align: center; padding: 2rem;
+  border-top: 1px solid var(--border);
+  font-family: var(--mono); font-size: 11px; color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">∇ GD EXPLAINER</div>
+  <div class="nav-links">
+    <a href="#what">What is GD</a>
+    <a href="#math">The math</a>
+    <a href="#interactive">Interactive</a>
+    <a href="#lr">Learning rate</a>
+    <a href="#variants">Variants</a>
+    <a href="#compare">Compare</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-tag">ML FUNDAMENTALS</div>
+  <h1>Gradient<br><span>Descent</span></h1>
+  <p>A visual, step-by-step explainer covering the math behind gradients, partial derivatives, and the difference between Batch GD, SGD, and Mini-batch GD.</p>
+</div>
+
+<main>
+
+<!-- ── SECTION 1 ── -->
+<div class="section" id="what">
+  <div class="section-label">01 / OVERVIEW</div>
+  <h2>What does gradient descent do?</h2>
+  <p>GD finds the model parameters (w, b) that minimize a loss function by repeatedly moving in the direction of steepest descent — opposite to the gradient.</p>
+  <div class="formula">
+    w &nbsp;← &nbsp;w &nbsp;− &nbsp;lr &nbsp;· &nbsp;∂L/∂w<br>
+    b &nbsp;← &nbsp;b &nbsp;− &nbsp;lr &nbsp;· &nbsp;∂L/∂b
+  </div>
+  <p style="color:var(--muted);font-size:13px">At every step: <em>which direction does the loss increase?</em> Move the opposite way. Repeat until loss stops decreasing.</p>
+</div>
+
+<!-- ── SECTION 2 ── -->
+<div class="section" id="math">
+  <div class="section-label">02 / THE MATH</div>
+  <h2>How the gradient is calculated</h2>
+  <p>For a linear model ŷ = Xw + b with MSE loss, here is the full derivation step by step.</p>
+
+  <div class="steps">
+
+    <div class="step-item">
+      <div class="step-num-col">
+        <div class="step-circle">1</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <h3>Define the loss function (MSE)</h3>
+        <div class="code-block">L = (1/n) · Σ (ŷᵢ − yᵢ)²</div>
+        <p style="font-size:13px;color:var(--muted);margin-top:8px">We want to minimize L over all training samples. ŷ is the prediction, y is the true label.</p>
+      </div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-num-col">
+        <div class="step-circle">2</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <h3>Substitute the model ŷ = Xw + b</h3>
+        <div class="code-block">L = (1/n) · Σ (Xw + b − y)²<br><br><span class="cm"># define error vector for convenience</span><br><span class="var">err</span> = Xw + b − y &nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># shape: (n_samples,)</span></div>
+      </div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-num-col">
+        <div class="step-circle">3</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <h3>Differentiate w.r.t. w — chain rule</h3>
+        <div class="code-block">∂L/∂w = (2/n) · Xᵀ @ err<br><br><span class="cm"># Why Xᵀ ?</span><br><span class="cm"># Each weight wⱼ affects loss through feature column j.</span><br><span class="cm"># Xᵀ[j] = all values of feature j across n samples.</span><br><span class="cm"># Dot with err = how much feature j contributed to error,</span><br><span class="cm">#               summed across all samples.</span><br><br><span class="cm"># Shape check:</span><br><span class="cm"># Xᵀ → (n_features, n_samples)</span><br><span class="cm"># err → (n_samples,)</span><br><span class="cm"># Xᵀ @ err → (n_features,)  ✓ one gradient per weight</span></div>
+      </div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-num-col">
+        <div class="step-circle">4</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <h3>Differentiate w.r.t. b — simpler</h3>
+        <div class="code-block">∂L/∂b = (2/n) · Σ err<br><br><span class="cm"># b is a scalar added to every prediction.</span><br><span class="cm"># Its derivative is just the mean error across all samples.</span></div>
+      </div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-num-col">
+        <div class="step-circle">5</div>
+      </div>
+      <div class="step-content">
+        <h3>Final Python implementation</h3>
+        <div class="code-block"><span class="kw">def</span> <span class="fn">gradients</span>(X, w, b, y):<br>
+&nbsp;&nbsp;<span class="var">n</span>   = len(y)<br>
+&nbsp;&nbsp;<span class="var">err</span> = X @ w + b − y &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># (n,)</span><br>
+&nbsp;&nbsp;<span class="var">dw</span>  = (2/n) * (X.T @ err) &nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># (n_features,)</span><br>
+&nbsp;&nbsp;<span class="var">db</span>  = (2/n) * np.sum(err) &nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># scalar</span><br>
+&nbsp;&nbsp;<span class="kw">return</span> dw, db<br><br>
+<span class="kw">def</span> <span class="fn">vanilla_gd</span>(X, y, lr, epochs):<br>
+&nbsp;&nbsp;<span class="var">w</span>, <span class="var">b</span> = np.zeros(X.shape[1]), 0.0<br>
+&nbsp;&nbsp;<span class="kw">for</span> epoch <span class="kw">in</span> range(epochs):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">dw</span>, <span class="var">db</span> = gradients(X, w, b, y)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">w</span> -= lr * dw<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">b</span> -= lr * db<br>
+&nbsp;&nbsp;<span class="kw">return</span> w, b</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── SECTION 3 INTERACTIVE ── -->
+<div class="section" id="interactive">
+  <div class="section-label">03 / INTERACTIVE</div>
+  <h2>Watch GD descend — step by step</h2>
+  <p>Using L(w) = w² as a simple example. Gradient = 2w. Hit <strong>Step</strong> to apply one update and see the exact math.</p>
+  <div class="card">
+    <div class="ctrl-row">
+      <label>Learning rate</label>
+      <input type="range" min="1" max="45" value="15" step="1" id="lrSlider">
+      <span class="val-display" id="lrVal">0.15</span>
+    </div>
+    <div class="canvas-wrap" style="height:280px">
+      <canvas id="cvMain" role="img" aria-label="Loss curve L=w squared showing gradient descent steps"></canvas>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">STEP</div><div class="stat-val" id="sStep">0</div></div>
+      <div class="stat-card"><div class="stat-label">w</div><div class="stat-val" id="sW">-2.000</div></div>
+      <div class="stat-card"><div class="stat-label">gradient 2w</div><div class="stat-val" id="sGrad">-4.000</div></div>
+      <div class="stat-card"><div class="stat-label">loss w²</div><div class="stat-val" id="sLoss">4.000</div></div>
+    </div>
+    <div class="explain-box" id="stepExplain">
+      Start: w = -2.000 &nbsp;|&nbsp; gradient = 2×(-2.000) = -4.000 &nbsp;|&nbsp; next w = -2.000 − 0.15×(-4.000) = -1.400
+    </div>
+    <div class="btn-row">
+      <button class="primary" onclick="stepGD()">Step ↓</button>
+      <button onclick="autoRun()" id="btnAuto">Auto run</button>
+      <button onclick="resetGD()">Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── SECTION 4 LR ── -->
+<div class="section" id="lr">
+  <div class="section-label">04 / LEARNING RATE</div>
+  <h2>What happens with different learning rates?</h2>
+  <p>The learning rate controls step size. Too small = slow. Too large = overshoots and diverges.</p>
+  <div class="grid3">
+    <div class="card card-sm">
+      <span class="badge b-teal">lr = 0.01 — too small</span>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Converges correctly but takes many epochs. Gradient is accurate but steps are tiny.</p>
+      <div class="canvas-wrap" style="height:150px"><canvas id="cvSlow" role="img" aria-label="Loss curve with lr=0.01 converging slowly"></canvas></div>
+    </div>
+    <div class="card card-sm">
+      <span class="badge b-blue">lr = 0.15 — just right</span>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Smooth, fast convergence. Loss drops steadily to near zero in few epochs.</p>
+      <div class="canvas-wrap" style="height:150px"><canvas id="cvGood" role="img" aria-label="Loss curve with lr=0.15 converging well"></canvas></div>
+    </div>
+    <div class="card card-sm">
+      <span class="badge b-red">lr = 0.95 — too high</span>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Overshoots the minimum. Loss oscillates or diverges instead of converging.</p>
+      <div class="canvas-wrap" style="height:150px"><canvas id="cvHigh" role="img" aria-label="Loss curve with lr=0.95 diverging"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SECTION 5 VARIANTS ── -->
+<div class="section" id="variants">
+  <div class="section-label">05 / VARIANTS</div>
+  <h2>Batch GD vs SGD vs Mini-batch GD</h2>
+  <p>All three variants minimize the same loss function using the same update rule. The only difference is <em>how many training samples</em> are used to compute the gradient at each update step. This single choice has major consequences for speed, memory, stability, and convergence behaviour.</p>
+
+  <div class="card" style="margin-bottom:12px">
+    <span class="badge b-blue">Batch GD — vanilla</span>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
+      Batch GD computes the gradient using the <strong style="color:var(--text)">entire training dataset</strong> at every single update step. Because the gradient is averaged over all n samples, it is mathematically exact — it points precisely in the direction of steepest descent on the true loss surface.
+    </p>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
+      The upside is smooth, stable convergence. The loss curve decreases monotonically (assuming a reasonable learning rate), and for convex loss functions like MSE, it is guaranteed to find the global minimum. There is no noise or randomness in the update direction.
+    </p>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
+      The downside becomes clear at scale. If you have 1 million training samples, you must compute predictions and errors for all 1 million rows before taking a single weight update. This is computationally expensive and slow. For large datasets, one epoch can take minutes, and the model learns nothing until that epoch completes.
+    </p>
+    <div class="code-block"><span class="kw">for</span> epoch <span class="kw">in</span> range(epochs):<br>
+&nbsp;&nbsp;<span class="var">err</span> = X_all @ w + b − y_all &nbsp;&nbsp;&nbsp;<span class="cm"># full dataset — all n samples</span><br>
+&nbsp;&nbsp;<span class="var">dw</span>  = (2/n) * X_all.T @ err &nbsp;&nbsp;<span class="cm"># exact gradient — no noise</span><br>
+&nbsp;&nbsp;<span class="var">w</span>  -= lr * dw &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># one update per epoch</span></div>
+  </div>
+
+  <div class="card" style="margin-bottom:12px">
+    <span class="badge b-amber">Stochastic GD — SGD</span>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
+      SGD goes to the opposite extreme — it computes the gradient using just <strong style="color:var(--text)">one randomly chosen sample</strong> per update. Instead of waiting to see the whole dataset, the model updates its weights after every single data point. In one epoch of 10,000 samples, the weights are updated 10,000 times, compared to just once with Batch GD.
+    </p>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
+      This speed is SGD's biggest strength. It starts learning immediately and can handle datasets that don't fit in memory, since it only needs one sample at a time. However, because the gradient is estimated from a single sample, it is very noisy — it may point in approximately the right direction but rarely the exact right one. The loss curve looks jittery and oscillates up and down even as it trends downward overall.
+    </p>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
+      Surprisingly, this noise is sometimes useful. In non-convex loss surfaces (like neural networks), the random fluctuations can help the optimizer escape shallow local minima or saddle points that Batch GD would get stuck in. However, SGD may never fully settle — it keeps bouncing around near the minimum rather than converging cleanly onto it.
+    </p>
+    <div class="code-block"><span class="kw">for</span> epoch <span class="kw">in</span> range(epochs):<br>
+&nbsp;&nbsp;<span class="kw">for</span> i <span class="kw">in</span> np.random.permutation(n): &nbsp;<span class="cm"># shuffle samples each epoch</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">xi</span>, <span class="var">yi</span> = X[i:i+1], y[i:i+1] &nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># pick 1 sample</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">err</span>     = xi @ w + b − yi &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># error on that sample only</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">dw</span>      = (2/1) * xi.T @ err &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># noisy gradient estimate</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">w</span>      -= lr * dw &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># n updates per epoch</span></div>
+  </div>
+
+  <div class="card featured">
+    <div class="featured-tag">INDUSTRY STANDARD</div><br>
+    <span class="badge b-teal">Mini-batch GD</span>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
+      Mini-batch GD is the practical middle ground that nearly all modern machine learning uses in production. Instead of using all samples or just one, it groups the data into small <strong style="color:var(--text)">batches of 32 to 256 samples</strong> and computes the gradient over each batch. The batch size is a hyperparameter you tune — common defaults are 32 or 64.
+    </p>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
+      With a batch of 32 samples, the gradient is a much better estimate than SGD's single-sample guess, but you still update the weights many times per epoch instead of just once. On a dataset of 10,000 samples with batch size 32, you get ~312 weight updates per epoch. This frequency of updates means the model learns much faster than Batch GD.
+    </p>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
+      Critically, Mini-batch GD is designed to take advantage of modern GPU hardware. GPUs are built to process matrix operations in parallel, and a batch of 32–256 samples can be processed simultaneously in a single matrix multiply — far more efficiently than looping sample-by-sample as SGD does. This is why deep learning frameworks like PyTorch and TensorFlow use mini-batch GD by default. The loss curve is smooth enough to track progress clearly, fast enough to converge quickly, and noisy enough to avoid the worst local minima traps.
+    </p>
+    <div class="code-block"><span class="kw">for</span> epoch <span class="kw">in</span> range(epochs):<br>
+&nbsp;&nbsp;<span class="kw">for</span> batch <span class="kw">in</span> get_batches(X, batch_size=32): &nbsp;<span class="cm"># ~n/32 updates per epoch</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">err</span> = batch @ w + b − y_batch &nbsp;&nbsp;<span class="cm"># error on 32 samples</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">dw</span>  = (2/32) * batch.T @ err &nbsp;&nbsp;&nbsp;<span class="cm"># stable approx gradient</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">w</span>  -= lr * dw &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># GPU-friendly matrix op</span></div>
+  </div>
+</div>
+
+<!-- ── SECTION 6 LOSS CURVES ── -->
+<div class="section" id="compare">
+  <div class="section-label">06 / LOSS CURVES</div>
+  <h2>Loss curves — all three variants</h2>
+  <p>Simulated over 60 epochs. Batch GD is smooth; SGD is noisy; Mini-batch is in between.</p>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#4f8ef7"></div>Batch GD</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#fbbf24"></div>SGD</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#34d399"></div>Mini-batch GD</div>
+  </div>
+  <div class="card">
+    <div class="canvas-wrap" style="height:280px">
+      <canvas id="cvLoss" role="img" aria-label="Loss curves for batch GD SGD and mini-batch GD over 60 epochs"></canvas>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px;padding:0;overflow:hidden">
+    <div class="cmp-row cmp-head" style="background:var(--surface2)">
+      <div class="cmp-cell"></div>
+      <div class="cmp-cell" style="color:#93bbfa">Batch GD</div>
+      <div class="cmp-cell" style="color:#fcd34d">SGD</div>
+      <div class="cmp-cell" style="color:#6ee7b7">Mini-batch</div>
+    </div>
+    <div class="cmp-row"><div class="cmp-cell cmp-label">Samples/update</div><div class="cmp-cell">All N</div><div class="cmp-cell">1</div><div class="cmp-cell">32–256</div></div>
+    <div class="cmp-row"><div class="cmp-cell cmp-label">Gradient</div><div class="cmp-cell">Exact</div><div class="cmp-cell">Noisy</div><div class="cmp-cell">Approx</div></div>
+    <div class="cmp-row"><div class="cmp-cell cmp-label">Speed</div><div class="cmp-cell">Slow</div><div class="cmp-cell">Fast</div><div class="cmp-cell">Fast</div></div>
+    <div class="cmp-row"><div class="cmp-cell cmp-label">Memory</div><div class="cmp-cell">High</div><div class="cmp-cell">Low</div><div class="cmp-cell">Medium</div></div>
+    <div class="cmp-row"><div class="cmp-cell cmp-label">Loss curve</div><div class="cmp-cell">Smooth</div><div class="cmp-cell">Jittery</div><div class="cmp-cell">Smooth-ish</div></div>
+    <div class="cmp-row"><div class="cmp-cell cmp-label">Convergence</div><div class="cmp-cell">Stable</div><div class="cmp-cell">Oscillates</div><div class="cmp-cell">Stable</div></div>
+    <div class="cmp-row"><div class="cmp-cell cmp-label">Local minima</div><div class="cmp-cell">Can get stuck</div><div class="cmp-cell">Can escape</div><div class="cmp-cell">Often escapes</div></div>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  built for github pages &nbsp;·&nbsp; gradient descent visual explainer &nbsp;·&nbsp; open source
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+var gd = { w: -2, step: 0, lr: 0.15, running: false, timer: null };
+
+function loss(w) { return w * w; }
+function grad(w) { return 2 * w; }
+
+function updateStats() {
+  var g = grad(gd.w);
+  var nextW = gd.w - gd.lr * g;
+  document.getElementById('sStep').textContent = gd.step;
+  document.getElementById('sW').textContent = gd.w.toFixed(3);
+  document.getElementById('sGrad').textContent = g.toFixed(3);
+  document.getElementById('sLoss').textContent = loss(gd.w).toFixed(3);
+  document.getElementById('stepExplain').textContent =
+    'w = ' + gd.w.toFixed(3) +
+    '  |  gradient = 2×(' + gd.w.toFixed(3) + ') = ' + g.toFixed(3) +
+    '  |  next w = ' + gd.w.toFixed(3) + ' − ' + gd.lr.toFixed(2) + '×(' + g.toFixed(3) + ') = ' + nextW.toFixed(3);
+}
+
+function drawMain() {
+  var canvas = document.getElementById('cvMain');
+  var wrap = canvas.parentElement;
+  canvas.width = wrap.clientWidth;
+  canvas.height = wrap.clientHeight;
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var pad = { l: 44, r: 20, t: 24, b: 36 };
+  var xMin = -2.6, xMax = 2.6, yMin = -0.3, yMax = 7;
+
+  function cx(w) { return pad.l + (w - xMin) / (xMax - xMin) * (W - pad.l - pad.r); }
+  function cy(l) { return H - pad.b - (l - yMin) / (yMax - yMin) * (H - pad.t - pad.b); }
+
+  ctx.clearRect(0, 0, W, H);
+
+  var tc = 'rgba(107,114,128,0.8)';
+  var ac = 'rgba(255,255,255,0.08)';
+  var gc = 'rgba(255,255,255,0.04)';
+
+  for (var gv = 0; gv <= 6; gv += 2) {
+    ctx.strokeStyle = gc; ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(pad.l, cy(gv)); ctx.lineTo(W - pad.r, cy(gv)); ctx.stroke();
+  }
+
+  ctx.strokeStyle = ac; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, H - pad.b); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(pad.l, H - pad.b); ctx.lineTo(W - pad.r, H - pad.b); ctx.stroke();
+
+  ctx.font = '11px "IBM Plex Mono", monospace';
+  ctx.fillStyle = tc; ctx.textAlign = 'center';
+  for (var wx = -2; wx <= 2; wx++) {
+    ctx.fillText(wx, cx(wx), H - pad.b + 16);
+    ctx.strokeStyle = gc; ctx.lineWidth = 0.5; ctx.setLineDash([3, 3]);
+    ctx.beginPath(); ctx.moveTo(cx(wx), pad.t); ctx.lineTo(cx(wx), H - pad.b); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  ctx.fillText('w', W - pad.r - 8, H - pad.b + 16);
+  ctx.textAlign = 'right';
+  for (var lv = 0; lv <= 6; lv += 2) { ctx.fillText(lv, pad.l - 6, cy(lv) + 4); }
+  ctx.fillText('L(w)', pad.l + 20, pad.t + 2);
+
+  ctx.strokeStyle = '#4f8ef7'; ctx.lineWidth = 2.5; ctx.beginPath();
+  var first = true;
+  for (var w = xMin; w <= xMax; w += 0.04) {
+    var x = cx(w), y = cy(loss(w));
+    if (first) { ctx.moveTo(x, y); first = false; } else { ctx.lineTo(x, y); }
+  }
+  ctx.stroke();
+
+  var wPath = -2, history = [{ w: wPath, l: loss(wPath) }];
+  for (var i = 0; i < gd.step; i++) {
+    wPath = wPath - gd.lr * grad(wPath);
+    history.push({ w: wPath, l: loss(wPath) });
+  }
+
+  if (history.length > 1) {
+    ctx.strokeStyle = '#f87171'; ctx.lineWidth = 1.5; ctx.setLineDash([5, 4]);
+    ctx.beginPath();
+    history.forEach(function (s, i) { i === 0 ? ctx.moveTo(cx(s.w), cy(s.l)) : ctx.lineTo(cx(s.w), cy(s.l)); });
+    ctx.stroke(); ctx.setLineDash([]);
+  }
+
+  history.forEach(function (s, i) {
+    var x = cx(s.w), y = cy(s.l);
+    ctx.beginPath(); ctx.arc(x, y, i === history.length - 1 ? 7 : 4, 0, Math.PI * 2);
+    ctx.fillStyle = i === history.length - 1 ? '#f87171' : 'rgba(248,113,113,0.25)';
+    ctx.fill();
+    if (i === history.length - 1) { ctx.strokeStyle = '#fca5a5'; ctx.lineWidth = 1.5; ctx.stroke(); }
+  });
+
+  if (history.length > 1) {
+    var last = history[history.length - 1];
+    var g2 = grad(last.w);
+    var tx = cx(last.w - gd.lr * g2), ty = cy(loss(last.w - gd.lr * g2));
+    ctx.strokeStyle = '#34d399'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(cx(last.w), cy(last.l)); ctx.lineTo(tx, ty); ctx.stroke();
+    ctx.fillStyle = '#34d399'; ctx.beginPath(); ctx.arc(tx, ty, 5, 0, Math.PI * 2); ctx.fill();
+  }
+
+  ctx.fillStyle = 'rgba(79,142,247,0.15)';
+  var zeroX = cx(0);
+  ctx.strokeStyle = 'rgba(79,142,247,0.3)'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+  ctx.beginPath(); ctx.moveTo(zeroX, pad.t); ctx.lineTo(zeroX, H - pad.b); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(79,142,247,0.6)'; ctx.font = '10px "IBM Plex Mono", monospace';
+  ctx.textAlign = 'left'; ctx.fillText('min', zeroX + 4, pad.t + 12);
+}
+
+function stepGD() {
+  if (Math.abs(gd.w) < 0.0005 && gd.step > 0) return;
+  gd.w = gd.w - gd.lr * grad(gd.w);
+  gd.step++;
+  updateStats(); drawMain();
+}
+
+function resetGD() {
+  clearInterval(gd.timer); gd.running = false;
+  document.getElementById('btnAuto').textContent = 'Auto run';
+  gd.w = -2; gd.step = 0;
+  updateStats(); drawMain();
+}
+
+function autoRun() {
+  if (gd.running) {
+    clearInterval(gd.timer); gd.running = false;
+    document.getElementById('btnAuto').textContent = 'Auto run'; return;
+  }
+  gd.running = true;
+  document.getElementById('btnAuto').textContent = 'Pause';
+  gd.timer = setInterval(function () {
+    if (Math.abs(gd.w) < 0.005 || gd.step > 80) {
+      clearInterval(gd.timer); gd.running = false;
+      document.getElementById('btnAuto').textContent = 'Auto run'; return;
+    }
+    stepGD();
+  }, 500);
+}
+
+document.getElementById('lrSlider').addEventListener('input', function () {
+  gd.lr = this.value / 100;
+  document.getElementById('lrVal').textContent = gd.lr.toFixed(2);
+  resetGD();
+});
+
+function makeLRChart(id, lr, color, label) {
+  var epochs = [], losses = [], w = 2;
+  for (var e = 0; e < 40; e++) {
+    w = w - lr * 2 * w;
+    epochs.push(e + 1);
+    losses.push(parseFloat(Math.max(0, w * w).toFixed(4)));
+  }
+  new Chart(document.getElementById(id), {
+    type: 'line',
+    data: { labels: epochs, datasets: [{ label: label, data: losses, borderColor: color, backgroundColor: 'transparent', borderWidth: 2, pointRadius: 0, tension: 0.3 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { maxTicksLimit: 5, font: { size: 10, family: 'IBM Plex Mono' }, color: '#6b7280' }, grid: { display: false }, border: { color: 'rgba(255,255,255,0.08)' } },
+        y: { ticks: { font: { size: 10, family: 'IBM Plex Mono' }, color: '#6b7280' }, grid: { color: 'rgba(255,255,255,0.04)' }, border: { color: 'rgba(255,255,255,0.08)' } }
+      }
+    }
+  });
+}
+
+function makeLossCompare() {
+  var epochs = Array.from({ length: 60 }, function (_, i) { return i + 1; });
+  function simBatch() { var w = 2.5, out = []; for (var e = 0; e < 60; e++) { w -= 0.15 * 2 * w; out.push(parseFloat(Math.max(0, w * w).toFixed(4))); } return out; }
+  function simSGD() { var w = 2.5, out = []; for (var e = 0; e < 60; e++) { for (var i = 0; i < 10; i++) { var n = (Math.random() - 0.5) * 0.9; w -= 0.05 * (2 * w + n); } out.push(parseFloat(Math.max(0, w * w + (Math.random() - 0.5) * 0.3).toFixed(4))); } return out; }
+  function simMini() { var w = 2.5, out = []; for (var e = 0; e < 60; e++) { for (var i = 0; i < 4; i++) { var n = (Math.random() - 0.5) * 0.25; w -= 0.12 * (2 * w + n); } out.push(parseFloat(Math.max(0, w * w + (Math.random() - 0.5) * 0.07).toFixed(4))); } return out; }
+  new Chart(document.getElementById('cvLoss'), {
+    type: 'line',
+    data: {
+      labels: epochs,
+      datasets: [
+        { label: 'Batch GD', data: simBatch(), borderColor: '#4f8ef7', backgroundColor: 'transparent', borderWidth: 2.5, pointRadius: 0, tension: 0.4 },
+        { label: 'SGD', data: simSGD(), borderColor: '#fbbf24', backgroundColor: 'transparent', borderWidth: 1.5, pointRadius: 0, tension: 0.2, borderDash: [5, 3] },
+        { label: 'Mini-batch', data: simMini(), borderColor: '#34d399', backgroundColor: 'transparent', borderWidth: 2, pointRadius: 0, tension: 0.3 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { title: { display: true, text: 'Epoch', font: { size: 11, family: 'IBM Plex Mono' }, color: '#6b7280' }, ticks: { maxTicksLimit: 10, font: { size: 11, family: 'IBM Plex Mono' }, color: '#6b7280' }, grid: { display: false }, border: { color: 'rgba(255,255,255,0.08)' } },
+        y: { title: { display: true, text: 'Loss', font: { size: 11, family: 'IBM Plex Mono' }, color: '#6b7280' }, ticks: { font: { size: 11, family: 'IBM Plex Mono' }, color: '#6b7280' }, grid: { color: 'rgba(255,255,255,0.04)' }, border: { color: 'rgba(255,255,255,0.08)' } }
+      }
+    }
+  });
+}
+
+window.addEventListener('load', function () {
+  drawMain(); updateStats();
+  makeLRChart('cvSlow', 0.01, '#34d399', 'lr=0.01');
+  makeLRChart('cvGood', 0.15, '#4f8ef7', 'lr=0.15');
+  makeLRChart('cvHigh', 0.95, '#f87171', 'lr=0.95');
+  makeLossCompare();
+});
+
+window.addEventListener('resize', function () { drawMain(); });
+</script>
+</body>
+</html>

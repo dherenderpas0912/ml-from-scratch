@@ -14,7 +14,6 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; line-height: 1.6; }
-
 nav {
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 2rem; height: 52px;
@@ -25,7 +24,6 @@ nav {
 .nav-brand { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500; color: var(--accent); }
 .nav-link { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; }
 .nav-link:hover { color: var(--text); }
-
 .hero { max-width: 780px; margin: 0 auto; padding: 5rem 2rem 3rem; }
 .hero-tag { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent); background: rgba(79,142,247,0.1); padding: 3px 10px; border-radius: 3px; display: inline-block; margin-bottom: 1.5rem; letter-spacing: 0.08em; }
 .hero h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; line-height: 1.1; margin-bottom: 1rem; }
@@ -35,11 +33,8 @@ nav {
 .hero-stat { font-family: 'IBM Plex Mono', monospace; }
 .hero-stat-num { font-size: 1.8rem; font-weight: 500; color: var(--text); }
 .hero-stat-label { font-size: 11px; color: var(--muted); }
-
 main { max-width: 780px; margin: 0 auto; padding: 0 2rem 6rem; }
-
 .phase-label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.1em; margin: 2.5rem 0 1rem; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
-
 .topic-card {
   display: grid; grid-template-columns: 40px 1fr auto;
   align-items: center; gap: 1rem;
@@ -47,36 +42,32 @@ main { max-width: 780px; margin: 0 auto; padding: 0 2rem 6rem; }
   border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 8px;
   text-decoration: none; color: inherit;
   transition: border-color .15s, background .15s;
+  cursor: pointer;
 }
-.topic-card:hover { border-color: var(--border2); background: var(--surface2); }
-.topic-card.active { border-color: rgba(79,142,247,0.3); }
-.topic-card.active:hover { border-color: rgba(79,142,247,0.5); }
-
+.topic-card.active:hover { border-color: rgba(79,142,247,0.5); background: var(--surface2); }
+.topic-card.inactive { cursor: default; opacity: 0.45; }
 .topic-num { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--muted); }
 .topic-info h3 { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
 .topic-info p { font-size: 12px; color: var(--muted); }
 .topic-badge { font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 3px 9px; border-radius: 3px; white-space: nowrap; }
 .badge-live { background: rgba(52,211,153,0.12); color: #6ee7b7; }
 .badge-soon { background: rgba(107,114,128,0.1); color: var(--muted); }
-
 footer { text-align: center; padding: 2rem; border-top: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); }
 footer a { color: var(--accent); text-decoration: none; }
 </style>
 </head>
 <body>
-
 <nav>
   <div class="nav-brand">∇ ML FROM SCRATCH</div>
-  <a class="nav-link" href="https://github.com/yourusername/ml-from-scratch" target="_blank">github →</a>
+  <a class="nav-link" href="https://github.com/dherenderpas0912/ml-from-scratch" target="_blank">github →</a>
 </nav>
-
 <div class="hero">
   <div class="hero-tag">PORTFOLIO</div>
   <h1>ML from<br><span>Scratch</span></h1>
   <p>Every major ML algorithm — derived mathematically, implemented in NumPy, and explained with interactive visuals. Built for deep understanding, not just model.fit().</p>
   <div class="hero-stats">
     <div class="hero-stat">
-      <div class="hero-stat-num" id="live-count">1</div>
+      <div class="hero-stat-num">1</div>
       <div class="hero-stat-label">live explainers</div>
     </div>
     <div class="hero-stat">
@@ -89,12 +80,10 @@ footer a { color: var(--accent); text-decoration: none; }
     </div>
   </div>
 </div>
-
 <main>
-
   <div class="phase-label">PHASE 1 — FOUNDATIONS</div>
 
-  <a class="topic-card active" href="/ml-from-scratch/01_gradient_descent/index.html">
+  <a class="topic-card active" href="./01_gradient_descent/index.html">
     <div class="topic-num">01</div>
     <div class="topic-info">
       <h3>Gradient Descent</h3>
@@ -103,98 +92,68 @@ footer a { color: var(--accent); text-decoration: none; }
     <span class="topic-badge badge-live">live ↗</span>
   </a>
 
-  <div class="topic-card" style="cursor:default;opacity:0.5">
+  <div class="topic-card inactive">
     <div class="topic-num">02</div>
-    <div class="topic-info">
-      <h3>Linear Regression</h3>
-      <p>OLS closed form · GD solution · R² and residuals</p>
-    </div>
+    <div class="topic-info"><h3>Linear Regression</h3><p>OLS closed form · GD solution · R² and residuals</p></div>
     <span class="topic-badge badge-soon">coming soon</span>
   </div>
 
-  <div class="topic-card" style="cursor:default;opacity:0.5">
+  <div class="topic-card inactive">
     <div class="topic-num">03</div>
-    <div class="topic-info">
-      <h3>Logistic Regression</h3>
-      <p>Sigmoid function · Binary cross-entropy loss · Decision boundary</p>
-    </div>
+    <div class="topic-info"><h3>Logistic Regression</h3><p>Sigmoid function · Binary cross-entropy loss · Decision boundary</p></div>
     <span class="topic-badge badge-soon">coming soon</span>
   </div>
 
-  <div class="topic-card" style="cursor:default;opacity:0.5">
+  <div class="topic-card inactive">
     <div class="topic-num">04</div>
-    <div class="topic-info">
-      <h3>Regularization</h3>
-      <p>L1 vs L2 · Bias-variance tradeoff · Effect on weights</p>
-    </div>
+    <div class="topic-info"><h3>Regularization</h3><p>L1 vs L2 · Bias-variance tradeoff · Effect on weights</p></div>
     <span class="topic-badge badge-soon">coming soon</span>
   </div>
 
   <div class="phase-label">PHASE 2 — TREE MODELS</div>
 
-  <div class="topic-card" style="cursor:default;opacity:0.5">
+  <div class="topic-card inactive">
     <div class="topic-num">05</div>
-    <div class="topic-info">
-      <h3>Decision Trees</h3>
-      <p>Information gain · Gini impurity · Recursive splitting</p>
-    </div>
+    <div class="topic-info"><h3>Decision Trees</h3><p>Information gain · Gini impurity · Recursive splitting</p></div>
     <span class="topic-badge badge-soon">coming soon</span>
   </div>
 
-  <div class="topic-card" style="cursor:default;opacity:0.5">
+  <div class="topic-card inactive">
     <div class="topic-num">06</div>
-    <div class="topic-info">
-      <h3>Random Forest</h3>
-      <p>Bagging · Feature sampling · OOB error estimation</p>
-    </div>
+    <div class="topic-info"><h3>Random Forest</h3><p>Bagging · Feature sampling · OOB error estimation</p></div>
     <span class="topic-badge badge-soon">coming soon</span>
   </div>
 
-  <div class="topic-card" style="cursor:default;opacity:0.5">
+  <div class="topic-card inactive">
     <div class="topic-num">07</div>
-    <div class="topic-info">
-      <h3>XGBoost</h3>
-      <p>Gradient boosting · Residual fitting · Regularized trees</p>
-    </div>
+    <div class="topic-info"><h3>XGBoost</h3><p>Gradient boosting · Residual fitting · Regularized trees</p></div>
     <span class="topic-badge badge-soon">coming soon</span>
   </div>
 
   <div class="phase-label">PHASE 3 — NEURAL NETWORKS</div>
 
-  <div class="topic-card" style="cursor:default;opacity:0.5">
+  <div class="topic-card inactive">
     <div class="topic-num">08</div>
-    <div class="topic-info">
-      <h3>Neural Networks</h3>
-      <p>Forward pass · Activation functions · Single hidden layer</p>
-    </div>
+    <div class="topic-info"><h3>Neural Networks</h3><p>Forward pass · Activation functions · Single hidden layer</p></div>
     <span class="topic-badge badge-soon">coming soon</span>
   </div>
 
-  <div class="topic-card" style="cursor:default;opacity:0.5">
+  <div class="topic-card inactive">
     <div class="topic-num">09</div>
-    <div class="topic-info">
-      <h3>Backpropagation</h3>
-      <p>Chain rule · Gradient flow · Weight updates layer by layer</p>
-    </div>
+    <div class="topic-info"><h3>Backpropagation</h3><p>Chain rule · Gradient flow · Weight updates layer by layer</p></div>
     <span class="topic-badge badge-soon">coming soon</span>
   </div>
 
   <div class="phase-label">PHASE 4 — UNSUPERVISED</div>
 
-  <div class="topic-card" style="cursor:default;opacity:0.5">
+  <div class="topic-card inactive">
     <div class="topic-num">10</div>
-    <div class="topic-info">
-      <h3>K-Means Clustering</h3>
-      <p>Cluster assignment · Centroid update · Inertia convergence</p>
-    </div>
+    <div class="topic-info"><h3>K-Means Clustering</h3><p>Cluster assignment · Centroid update · Inertia convergence</p></div>
     <span class="topic-badge badge-soon">coming soon</span>
   </div>
-
 </main>
-
 <footer>
-  <a href="https://github.com/dherenderpas0912/ml-from-scratch" target="_blank">github →</a>
+  <a href="https://github.com/dherenderpas0912/ml-from-scratch" target="_blank">github</a>
 </footer>
-
 </body>
 </html>

@@ -16,7 +16,7 @@ Most ML practitioners can call a sklearn function. Fewer can explain why the gra
 
 | # | Topic | Notebook | Live Visual | Key concept covered |
 |---|---|---|---|---|
-| 01 | Gradient Descent | [notebook](01_gradient_descent/notebook.ipynb) | [open →](https://dherenderpas0912.github.io/ml-from-scratch/01_gradient_descent/) | ∂L/∂w derivation, Batch vs SGD vs Mini-batch |
+| 01 | Gradient Descent | [notebook](docs/01_gradient_descent/notebook.ipynb) | [open →](https://dherenderpas0912.github.io/ml-from-scratch/01_gradient_descent/index.html) | ∂L/∂w derivation, Batch vs SGD vs Mini-batch |
 | 02 | Linear Regression | coming soon | coming soon | OLS solution vs GD, R² |
 | 03 | Logistic Regression | coming soon | coming soon | Sigmoid, BCE loss, decision boundary |
 | 04 | Regularization | coming soon | coming soon | L1 vs L2, bias-variance tradeoff |
@@ -46,11 +46,20 @@ Phase 2 — Tree models
 Phase 3 — Neural networks
   ⬜ 08. Neural Network (1 hidden layer)
   ⬜ 09. Backpropagation
-  ⬜ 10. CNNs (concept + architecture)
 
 Phase 4 — Unsupervised
-  ⬜ 11. K-Means Clustering
-  ⬜ 12. PCA
+  ⬜ 10. K-Means Clustering
+```
+
+---
+
+## Run any notebook
+
+```bash
+git clone https://github.com/dherenderpas0912/ml-from-scratch
+cd ml-from-scratch
+pip install numpy matplotlib scikit-learn jupyter
+jupyter notebook docs/01_gradient_descent/notebook.ipynb
 ```
 
 ---
@@ -62,18 +71,3 @@ Phase 4 — Unsupervised
 - **Matplotlib** — notebook plots
 - **Chart.js + vanilla JS** — interactive web explainers
 - **GitHub Pages** — hosting, zero infra
-
----
-
-## Run any notebook
-
-```bash
-git clone https://github.com/yourusername/ml-from-scratch
-cd ml-from-scratch
-pip install numpy matplotlib scikit-learn jupyter
-jupyter notebook 01_gradient_descent/notebook.ipynb
-```
-
----
-
-
